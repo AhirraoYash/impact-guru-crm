@@ -56,4 +56,9 @@ Route::middleware('auth')->group(function () {
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
+        // SHARED ROUTES (Admin & Staff)
+Route::middleware(['auth'])->group(function () {
+    // This one line creates ALL routes: index, create, store, show, edit, update, destroy
+    Route::resource('customers', \App\Http\Controllers\CustomerController::class);
+});
 });
