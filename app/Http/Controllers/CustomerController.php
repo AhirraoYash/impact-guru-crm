@@ -28,17 +28,27 @@ class CustomerController extends Controller
      */
     public function store(\Illuminate\Http\Request $request)
     {
-        // 1. Validate the data (Make sure it's good)
         $request->validate([
             'name' => 'required',
             'email' => 'required|email|unique:customers',
             'phone' => 'required',
+            'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Allow images only
         ]);
 
-        // 2. Save to Database
-        \App\Models\Customer::create($request->all());
+        // 1. Get all text data
+        $input = $request->all();
 
-        // 3. Go back to the list
+        // 2. Check if user uploaded an image
+        if ($request->hasFile('profile_image')) {
+            $image = $request->file('profile_image');
+            $name = time().'.'.$image->getClientOriginalExtension();
+            $image->move(public_path('images'), $name); // Save to public/images folder
+            $input['profile_image'] = $name;
+        }
+
+        // 3. Save to Database
+        Customer::create($input);
+
         return redirect()->route('customers.index')->with('success', 'Customer created successfully.');
     }
 
